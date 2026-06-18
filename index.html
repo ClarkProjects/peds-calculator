@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pediatric Dose Calculator</title>
+    <style>
+        :root {
+            --primary: #007aff;
+            --bg: #f2f2f7;
+            --card: #ffffff;
+            --text: #1c1c1e;
+            --muted: #8e8e93;
+            --border: #e5e5ea;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 16px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 18px;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background: #fafafa;
+        }
+        .row {
+            display: flex;
+            gap: 12px;
+        }
+        .col {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .result-box {
+            margin-top: 12px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        .highlight {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+        .divider {
+            height: 2px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  <div style="text-align: center; margin-bottom: 10px;">
+    <h1 style="font-size: 28px; font-weight: bold;">Pediatric Dose Calculator</h1>
+<div class="card" style="background: #e3f2fd; border: 1px solid #bbdefb;">
+        <div class="input-group" style="margin-bottom: 0;">
+            <label for="globalWeight">Patient Weight (kg)</label>
+            <input type="number" id="globalWeight" placeholder="Enter weight in kg" step="0.1" oninput="calculateAllPresetDoses()">
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Fever Reducers
+      </h2>
+        <div class="row">
+            <div class="col">
+                <span style="font-weight:bold; color:#d32f2f;">Acetaminophen</span>
+                <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">15 mg/kg | 160mg/5mL</div>
+                <div class="result-box" id="acetaminophenResult">Enter weight...</div>
+            </div>
+            <div class="col">
+                <span style="font-weight:bold; color:#1976d2;">Ibuprofen</span>
+                <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">10 mg/kg | 100mg/5mL</div>
+                <div class="result-box" id="ibuprofenResult">Enter weight...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Antibiotics</h2>
+        <div class="input-group">
+            <label for="antibioticSelect">Select Medication</label>
+            <select id="antibioticSelect" onchange="calculateAllPresetDoses()">
+                <option value="amoxicillin">Amoxicillin (90 mg/kg/day & 50mg/kg/day)</option>
+                <option value="augmentin_es">Augmentin ES (90 mg/kg/day | 600mg/5mL)</option>
+                <option value="cephalexin">Cephalexin (50 mg/kg/day | 250mg/5mL )</option>
+                <option value="azithromycin">Azithromycin (10 mg/kg Day 1 | 200mg/5mL)</option>
+                <option value="clindamycin">Clindamycin (20 mg/kg/day | 75mg/5mL)</option>
+                <option value="cefdinir">Cefdinir (14 mg/kg/day | 250mg/5mL)</option>
+                <option value="bactrim">Bactrim (8 mg/kg/day TMP | 40mg TMP/5mL)</option>
+            </select>
+        </div>
+        <div class="result-box" id="antibioticResult" style="background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+            Enter weight to see dose.
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card" style="background: #f9f9f9; border: 1px dashed var(--muted);">
+        <h2>Custom Weight-Based Calculator</h2>
+        <div class="row" style="margin-bottom: 10px;">
+            <div class="input-group" style="flex:1; margin-bottom:0;">
+                <label>Weight (kg)</label>
+                <input type="number" id="customWeight" placeholder="kg" step="0.1">
+            </div>
+            <div class="input-group" style="flex:1; margin-bottom:0;">
+                <label>Dose (mg/kg)</label>
+                <input type="number" id="customDose" placeholder="mg/kg">
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group" style="flex:1; margin-bottom:0;">
+                <label>Stock mg</label>
+                <input type="number" id="customStockMg" placeholder="e.g. 250">
+            </div>
+            <div class="input-group" style="flex:1; margin-bottom:0;">
+                <label>Per Volume mL</label>
+                <input type="number" id="customStockMl" placeholder="e.g. 5">
+            </div>
+        </div>
+        <button onclick="calculateCustomDose()">Calculate Custom Dose</button>
+        <div class="result-box" id="customResult" style="margin-top:12px; font-weight:bold; text-align:center;"></div>
+    </div>
+</div>
+
+<script>
+function calculateAllPresetDoses() {
+    const w = parseFloat(document.getElementById('globalWeight').value);
+    
+    if (!w || w <= 0) {
+        document.getElementById('acetaminophenResult').innerHTML = "Enter weight...";
+        document.getElementById('ibuprofenResult').innerHTML = "Enter weight...";
+        document.getElementById('antibioticResult').innerHTML = "Enter weight to see dose.";
+        return;
+    }
+
+    // --- 1. ACETAMINOPHEN ---
+    let aceMg = w * 15;
+    let aceCapped = false;
+    if (aceMg > 650) { aceMg = 650; aceCapped = true; }
+    const aceMl = (aceMg / 160) * 5;
+    document.getElementById('acetaminophenResult').innerHTML = `
+        Dose: <span class="highlight">${aceMg.toFixed(1)} mg</span><br>
+        Volume: <span class="highlight">${aceMl.toFixed(1)} mL</span>
+        ${aceCapped ? '<br><small style="color:orange;">(Max Cap Hit)</small>' : ''}
+    `;
+
+    // --- 2. IBUPROFEN ---
+    let ibuMg = w * 10;
+    let ibuCapped = false;
+    if (ibuMg > 400) { ibuMg = 400; ibuCapped = true; }
+    const ibuMl = (ibuMg / 100) * 5;
+    document.getElementById('ibuprofenResult').innerHTML = `
+        Dose: <span class="highlight">${ibuMg.toFixed(1)} mg</span><br>
+        Volume: <span class="highlight">${ibuMl.toFixed(1)} mL</span>
+        ${ibuCapped ? '<br><small style="color:orange;">(Max Cap Hit)</small>' : ''}
+    `;
+
+    // --- 3. ANTIBIOTICS ---
+    const selectedAbx = document.getElementById('antibioticSelect').value;
+    let abxText = "";
+
+    switch(selectedAbx) {
+        case "amoxicillin":
+            // --- High Dose (90 mg/kg/day) Capped at 2000mg ---
+            let amoxTotal90 = w * 90;
+            let amoxCapped90 = false;
+            if (amoxTotal90 > 2000) { amoxTotal90 = 2000; amoxCapped90 = true; }
+            let singleMg90 = amoxTotal90 / 2;
+            let ml400_90 = (singleMg90 / 400) * 5;
+
+            // --- Standard Dose (50 mg/kg/day) Capped at 1000mg ---
+            let amoxTotal50 = w * 50;
+            let amoxCapped50 = false;
+            if (amoxTotal50 > 1000) { amoxTotal50 = 1000; amoxCapped50 = true; }
+            let singleMg50 = amoxTotal50 / 2;
+            let ml400_50 = (singleMg50 / 400) * 5;
+
+            abxText = `
+                <div style="border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
+                    <strong style="color: #d9534f;">High Dose (90 mg/kg/d):</strong> ${amoxTotal90.toFixed(1)} mg/day ${amoxCapped90 ? '<span style="color:orange;font-weight:bold;">(Capped Max)</span>' : ''}<br>
+                    Single: ${singleMg90.toFixed(1)} mg BID<br>
+                    Give: <span class="highlight" style="font-size:16px;">${ml400_90.toFixed(1)} mL</span> of 400mg/5mL <span class="highlight">BID</span>
+                </div>
+                <div>
+                    <strong style="color: #0275d8;">Standard Dose (50 mg/kg/d):</strong> ${amoxTotal50.toFixed(1)} mg/day ${amoxCapped50 ? '<span style="color:orange;font-weight:bold;">(Capped Max)</span>' : ''}<br>
+                    Single: ${singleMg50.toFixed(1)} mg BID<br>
+                    Give: <span class="highlight" style="font-size:16px;">${ml400_50.toFixed(1)} mL</span> of 400mg/5mL <span class="highlight">BID</span>
+                </div>
+            `;
+            break;
+
+        case "augmentin_es":
+            // 90 mg/kg/day based on amoxicillin component, split BID. Concentration 600mg / 5mL.
+            let augTotalMg = w * 90;
+            let augCapped = false;
+            if (augTotalMg > 2000) {
+                augTotalMg = 2000;
+                augCapped = true;
+            }
+            let augSingleMg = augTotalMg / 2;
+            let augSingleMl = (augSingleMg / 600) * 5;
+            abxText = `
+                <strong>Augmentin ES Total:</strong> ${augTotalMg.toFixed(1)} mg/day (Amoxicillin component)${augCapped ? ' <span style="color:orange;font-weight:bold;">(Capped at 2000mg Max)</span>' : ''}<br>
+                <strong>Single Dose:</strong> ${augSingleMg.toFixed(1)} mg every 12 hours.<br>
+                Give: <span class="highlight" style="font-size:16px;">${augSingleMl.toFixed(1)} mL</span> of 600mg-42.9mg/5mL <span class="highlight">BID</span>.
+            `;
+            break;
+
+        case "cephalexin":
+            let cephTotalMg = w * 50;
+            let cephCapped = false;
+            if (cephTotalMg > 1500) {
+                cephTotalMg = 1500;
+                cephCapped = true;
+            }
+            let cephSingleMg = cephTotalMg / 3;
+            let cephSingleMl = (cephSingleMg / 250) * 5;
+            abxText = `
+                <strong>Cephalexin Total:</strong> ${cephTotalMg.toFixed(1)} mg/day ${cephCapped ? ' <span style="color:orange;font-weight:bold;">(Capped at 1500mg Max)</span>' : ''}<br>
+                <strong>Single Dose:</strong> ${cephSingleMg.toFixed(1)} mg every 8 hours.<br>
+                Give: <span class="highlight" style="font-size:16px;">${cephSingleMl.toFixed(1)} mL</span> of 250mg/5mL <span class="highlight">TID</span>.
+            `;
+            break;
+
+        case "azithromycin":
+            let aziMgDay1 = w * 10;
+            let aziCapped = false;
+            if (aziMgDay1 > 500) {
+                aziMgDay1 = 500;
+                aziCapped = true;
+            }
+            let aziMlDay1 = (aziMgDay1 / 200) * 5;
+            let aziMlDays2_5 = aziMlDay1 / 2;
+            abxText = `
+                <strong>Azithromycin Total:</strong> ${aziMgDay1.toFixed(1)} mg Day 1 loading dose ${aziCapped ? ' <span style="color:orange;font-weight:bold;">(Capped at 500mg Max)</span>' : ''}<br>
+                <strong>Follow-up Dose:</strong> ${(aziMgDay1 / 2).toFixed(1)} mg once daily on Days 2-5.<br>
+                Give: <span class="highlight" style="font-size:16px;">${aziMlDay1.toFixed(1)} mL</span> Day 1, then <span class="highlight" style="font-size:16px;">${aziMlDays2_5.toFixed(1)} mL</span> Days 2-5.
+            `;
+            break;
+
+        case "clindamycin":
+            let clinTotalMg = w * 20;
+            let clinCapped = false;
+            if (clinTotalMg > 1350) {
+                clinTotalMg = 1350;
+                clinCapped = true;
+            }
+            let clinSingleMg = clinTotalMg / 3;
+            let clinSingleMl = (clinSingleMg / 75) * 5;
+            abxText = `
+                <strong>Clindamycin Total:</strong> ${clinTotalMg.toFixed(1)} mg/day ${clinCapped ? ' <span style="color:orange;font-weight:bold;">(Capped at 1350mg Max)</span>' : ''}<br>
+                <strong>Single Dose:</strong> ${clinSingleMg.toFixed(1)} mg every 8 hours.<br>
+                Give: <span class="highlight" style="font-size:16px;">${clinSingleMl.toFixed(1)} mL</span> of 75mg/5mL <span class="highlight">TID</span>.
+            `;
+            break;
+
+        case "cefdinir":
+            let cefMg = w * 14;
+            let cefCapped = false;
+            if (cefMg > 600) {
+                cefMg = 600;
+                cefCapped = true;
+            }
+            let cefMl = (cefMg / 250) * 5;
+            abxText = `
+                <strong>Cefdinir Total:</strong> ${cefMg.toFixed(1)} mg/day ${cefCapped ? ' <span style="color:orange;font-weight:bold;">(Capped at 600mg Max)</span>' : ''}<br>
+                <strong>Single Dose:</strong> ${cefMg.toFixed(1)} mg once daily.<br>
+                Give: <span class="highlight" style="font-size:16px;">${cefMl.toFixed(1)} mL</span> of 250mg/5mL <span class="highlight">Daily</span>.
+            `;
+            break;
+
+        case "bactrim":
+            // Dosing based on TMP component: 8 mg/kg/day split BID. Concentration: 40mg TMP / 5mL.
+            let bacTotalMg = w * 8;
+            let bacCapped = false;
+            if (bacTotalMg > 320) {
+                bacTotalMg = 320;
+                bacCapped = true;
+            }
+            let bacSingleMg = bacTotalMg / 2;
+            let bacSingleMl = (bacSingleMg / 40) * 5;
+            abxText = `
+                <strong>Bactrim Total (TMP):</strong> ${bacTotalMg.toFixed(1)} mg/day ${bacCapped ? ' <span style="color:orange;font-weight:bold;">(Capped at 320mg Max)</span>' : ''}<br>
+                <strong>Single Dose:</strong> ${bacSingleMg.toFixed(1)} mg every 12 hours.<br>
+                Give: <span class="highlight" style="font-size:16px;">${bacSingleMl.toFixed(1)} mL</span> of 40mg-200mg/5mL <span class="highlight">BID</span>.
+            `;
+            break;
+    }
+    document.getElementById('antibioticResult').innerHTML = abxText;
+}
+
+function calculateCustomDose() {
+    const w = parseFloat(document.getElementById('customWeight').value);
+    const dose = parseFloat(document.getElementById('customDose').value);
+    const stockMg = parseFloat(document.getElementById('customStockMg').value);
+    const stockMl = parseFloat(document.getElementById('customStockMl').value);
+
+    if (!w || !dose || !stockMg || !stockMl) {
+        document.getElementById('customResult').innerHTML = "<span style='color:red;'>Please fill all fields</span>";
+        return;
+    }
+
+    const totalMg = w * dose;
+    const totalMl = (totalMg / stockMg) * stockMl;
+
+    document.getElementById('customResult').innerHTML = `
+        Custom Dose: ${totalMg.toFixed(1)} mg<br>
+        <span style="color:var(--primary); font-size:18px;">Custom Volume: ${totalMl.toFixed(1)} mL</span>
+    `;
+}
+</script>
+
+</body>
+</html>
